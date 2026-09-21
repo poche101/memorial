@@ -29,10 +29,18 @@
         <td>{{ \Illuminate\Support\Str::limit($entry->description, 80) }}</td>
         <td class="table-actions">
           <button type="button" class="btn"
-                  onclick="openEditModal({{ $entry->id }}, {{ json_encode($entry->year_label) }}, {{ $entry->event_date?->format('Y-m-d') ? "'{$entry->event_date->format('Y-m-d')}'" : 'null' }}, {{ json_encode($entry->title) }}, {{ json_encode($entry->description) }})">
+                  data-edit-url="{{ route('admin.timeline.update', $entry) }}"
+                  data-year-label="{{ $entry->year_label }}"
+                  data-event-date="{{ $entry->event_date?->format('Y-m-d') }}"
+                  data-title="{{ $entry->title }}"
+                  data-description="{{ $entry->description }}"
+                  onclick="openEditModal(this)">
             Edit
           </button>
-          <button type="button" class="btn danger" onclick="openDeleteModal({{ $entry->id }}, {{ json_encode($entry->title) }})">
+          <button type="button" class="btn danger"
+                  data-delete-url="{{ route('admin.timeline.destroy', $entry) }}"
+                  data-title="{{ $entry->title }}"
+                  onclick="openDeleteModal(this)">
             Delete
           </button>
         </td>
@@ -97,22 +105,22 @@
 </style>
 
 <script>
-function openEditModal(id, yearLabel, eventDate, title, description) {
+function openEditModal(btn) {
   const form = document.getElementById('editForm');
-  form.action = `{{ url('admin/timeline') }}/${id}`;
-  document.getElementById('edit_year_label').value = yearLabel;
-  document.getElementById('edit_event_date').value = eventDate ?? '';
-  document.getElementById('edit_title').value = title;
-  document.getElementById('edit_description').value = description;
+  form.action = btn.dataset.editUrl;
+  document.getElementById('edit_year_label').value = btn.dataset.yearLabel;
+  document.getElementById('edit_event_date').value = btn.dataset.eventDate || '';
+  document.getElementById('edit_title').value = btn.dataset.title;
+  document.getElementById('edit_description').value = btn.dataset.description || '';
   document.getElementById('editModal').style.display = 'flex';
 }
 function closeEditModal() {
   document.getElementById('editModal').style.display = 'none';
 }
 
-function openDeleteModal(id, title) {
-  document.getElementById('deleteModalText').textContent = `Remove "${title}" from the timeline? This can't be undone.`;
-  document.getElementById('deleteForm').action = `{{ url('admin/timeline') }}/${id}`;
+function openDeleteModal(btn) {
+  document.getElementById('deleteModalText').textContent = `Remove "${btn.dataset.title}" from the timeline? This can't be undone.`;
+  document.getElementById('deleteForm').action = btn.dataset.deleteUrl;
   document.getElementById('deleteModal').style.display = 'flex';
 }
 function closeDeleteModal() {
