@@ -67,8 +67,11 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::put('/memorial', [MemorialController::class, 'update'])->name('memorial.update');
 
         Route::resource('timeline', TimelineEntryController::class)
-            ->only(['index', 'store', 'update', 'destroy']);
-        Route::post('/timeline/reorder', [TimelineEntryController::class, 'reorder'])->name('timeline.reorder');
+    ->parameters(['timeline' => 'timelineEntry'])
+    ->only(['index', 'store', 'update', 'destroy']);
+
+Route::post('/timeline/reorder', [TimelineEntryController::class, 'reorder'])
+    ->name('timeline.reorder');
 
         Route::get('/gallery', [AlbumController::class, 'index'])->name('gallery.index');
         Route::post('/gallery/albums', [AlbumController::class, 'store'])->name('gallery.albums.store');

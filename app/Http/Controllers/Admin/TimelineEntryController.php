@@ -9,6 +9,7 @@ use App\Models\TimelineEntry;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class TimelineEntryController extends Controller
 {
@@ -18,7 +19,7 @@ class TimelineEntryController extends Controller
 
         return view('admin.timeline.index', [
             'memorial' => $memorial,
-            'entries' => $memorial->timelineEntries,
+            'entries' => $memorial->timelineEntries()->orderBy('sort_order')->get(),
         ]);
     }
 
@@ -37,6 +38,8 @@ class TimelineEntryController extends Controller
 
     public function update(Request $request, TimelineEntry $timelineEntry): RedirectResponse
     {
+        $this->assertBelongsToMemorial($timelineEntry);
+
         $timelineEntry->update($this->validated($request));
         AuditLog::record('timeline.updated', $timelineEntry);
 
@@ -45,6 +48,8 @@ class TimelineEntryController extends Controller
 
     public function destroy(TimelineEntry $timelineEntry): RedirectResponse
     {
+        $this->assertBelongsToMemorial($timelineEntry);
+
         AuditLog::record('timeline.deleted', $timelineEntry, $timelineEntry->title);
         $timelineEntry->delete();
 
@@ -53,13 +58,27 @@ class TimelineEntryController extends Controller
 
     public function reorder(Request $request): RedirectResponse
     {
+        $memorial = Memorial::firstOrFail();
         $data = $request->validate(['order' => ['required', 'array']]);
 
+        $validIds = $memorial->timelineEntries()->pluck('id')->all();
+
         foreach ($data['order'] as $position => $id) {
-            TimelineEntry::where('id', $id)->update(['sort_order' => $position]);
+            if (in_array((int) $id, $validIds, true)) {
+                TimelineEntry::where('id', $id)->update(['sort_order' => $position]);
+            }
         }
 
         return back()->with('status', 'Timeline order updated.');
+    }
+
+    protected function assertBelongsToMemorial(TimelineEntry $timelineEntry): void
+    {
+        $memorial = Memorial::firstOrFail();
+
+        if ($timelineEntry->memorial_id !== $memorial->id) {
+            throw new NotFoundHttpException;
+        }
     }
 
     protected function validated(Request $request): array
