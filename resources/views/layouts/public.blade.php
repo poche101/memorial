@@ -148,7 +148,7 @@
     <div>
       <div class="eyebrow">Celebration of Life</div>
       <h1 class="hero-name">{{ $memorial->title ?? '' }}<br>{{ $memorial->name ?? 'Loading' }}</h1>
-      <div class="hero-title">Beloved Father, Shepherd &amp; Friend</div>
+      <div class="hero-title">Beloved Father, Pastor &amp; Friend</div>
       <div class="hero-dates">
         <span>{{ $memorial->birth_date?->format('Y') }}</span><span class="dash"></span><span>{{ $memorial->death_date?->format('Y') }}</span>
       </div>
