@@ -32,7 +32,6 @@
           <label for="tConsent">I consent to my name and message being reviewed and published on this memorial page.</label>
         </div>
         <button type="submit" class="submit-btn">Submit Tribute</button>
-        <div class="form-note">Submissions are held for family review before appearing on the wall.</div>
       </form>
 
       <div class="tribute-carousel-col">
