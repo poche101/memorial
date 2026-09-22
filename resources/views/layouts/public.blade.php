@@ -156,6 +156,7 @@
       <p class="hero-verse">&ldquo;{{ $memorial->statement }}&rdquo;</p>
       @endif
       <nav class="hero-nav">
+        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
         <a href="{{ route('biography') }}" class="{{ request()->routeIs('biography') ? 'active' : '' }}">Biography</a>
         <a href="{{ route('timeline') }}" class="{{ request()->routeIs('timeline') ? 'active' : '' }}">Life Timeline</a>
         <a href="{{ route('events') }}" class="{{ request()->routeIs('events') ? 'active' : '' }}">Arrangements</a>
