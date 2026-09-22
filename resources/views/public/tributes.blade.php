@@ -21,7 +21,7 @@
         </div>
         <div class="field">
           <label for="tMsg">Your message</label>
-          <textarea id="tMsg" name="message" required placeholder="Share a memory, a word of comfort, or a prayer for the family...">{{ old('message') }}</textarea>
+          <textarea id="tMsg" name="message" required placeholder="Share a memory">{{ old('message') }}</textarea>
         </div>
         <div class="field">
           <label for="tImg">Photo (optional)</label>

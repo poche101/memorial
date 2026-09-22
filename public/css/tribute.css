@@ -36,26 +36,166 @@ img{max-width:100%;display:block;}
 .container{max-width:1040px;margin:0 auto;padding:0 32px;}
 
 /* ---------- HERO ---------- */
+/* Real <img> element (not a CSS background) so the full banner always
+   displays at its native ratio with no cropping/letterboxing math.
+   The nav sits in an absolutely-positioned bar pinned to the bottom,
+   with its own dark gradient confined to just that strip. */
 .hero{
   position:relative;
-  background:
-    radial-gradient(ellipse 900px 500px at 75% -10%, rgba(217,184,118,0.22), transparent 60%),
-    linear-gradient(180deg, var(--navy-deep) 0%, var(--navy) 65%, var(--navy-soft) 100%);
-  color:var(--ivory);
-  overflow:hidden;
-}
-.hero-inner{
-  max-width:1100px;
-  margin:0 auto;
-  padding:108px 32px 88px;
-  display:grid;
-  grid-template-columns:360px 1fr;
-  gap:64px;
-  align-items:center;
+  width:100%;
+  overflow:visible; /* was hidden — let the mobile dropdown extend past the image without being clipped */
+  line-height:0; /* removes whitespace gap under the inline img */
 }
 
-/* Ornamental frame around the portrait: a thick, beveled gold picture-frame
-   with an ivory mat and a laurel flourish above. */
+/* Semi-transparent dark blue overlay across the whole hero, sitting
+   above the background image but below the nav bar content. */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(15,27,47,0.55);
+  z-index:0;
+  pointer-events:none;
+}
+
+.hero-bg-img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+
+.hero-inner{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  display:flex;
+  align-items:flex-end; /* nav pinned to the very bottom edge */
+}
+
+.hero-nav{
+  width:100%;
+  margin:0;
+  padding:14px 32px 18px;
+  font-size:16px;
+  background:linear-gradient(
+    to top,
+    rgba(15,27,47,0.92) 0%,
+    rgba(15,27,47,0.75) 55%,
+    rgba(15,27,47,0) 100%
+  );
+}
+
+/* Toolbar row (hamburger button) — hidden on desktop, shown on mobile */
+.hero-nav-bar{
+  display:none;
+  justify-content:flex-end;
+}
+.hero-nav-toggle{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:40px;
+  height:40px;
+  padding:0;
+  background:transparent;
+  border:1px solid rgba(217,184,118,0.45);
+  border-radius:2px;
+  color:var(--gold-light);
+  cursor:pointer;
+}
+.hero-nav-toggle .icon-close{display:none;}
+.hero-nav-toggle[aria-expanded="true"] .icon-menu{display:none;}
+.hero-nav-toggle[aria-expanded="true"] .icon-close{display:block;}
+
+.hero-nav-links{
+  display:flex;
+  gap:24px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+.hero-nav-links a{
+  flex-shrink:0;
+  text-decoration:none;
+  color:#e8e3d3;
+  border-bottom:1px solid transparent;
+  padding-bottom:3px;
+  white-space:nowrap;
+  transition:border-color .2s ease, color .2s ease;
+}
+.hero-nav-links a:hover{border-color:var(--gold-light); color:var(--gold-light);}
+.hero-nav-links a.active{border-color:var(--gold-light); color:var(--gold-light);}
+
+@media (min-width:1200px){
+  /* Scale the nav up on wide desktop screens so it doesn't look tiny
+     against a large hero banner. */
+  .hero-nav{font-size:18px; padding:18px 48px 22px;}
+  .hero-nav-links{gap:34px;}
+}
+
+@media (max-width:720px){
+  /* On mobile, pin the whole nav bar (toggle + dropdown) to the TOP of
+     the hero instead of the bottom, so the hamburger doesn't crowd the
+     name/date graphic lower in the banner. Desktop is untouched. */
+  .hero-inner{align-items:flex-start;}
+  .hero-nav{
+    padding:12px 16px 14px;
+    font-size:15px;
+    background:linear-gradient(
+      to bottom,
+      rgba(15,27,47,0.92) 0%,
+      rgba(15,27,47,0.75) 55%,
+      rgba(15,27,47,0) 100%
+    );
+  }
+  .hero-nav-bar{display:flex;}
+  .hero-nav-links{
+    flex-direction:column;
+    align-items:stretch;
+    gap:2px;
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    margin-top:0;
+    transition:max-height .3s ease, opacity .25s ease, margin-top .3s ease;
+  }
+  .hero-nav-links.open{
+    background:rgba(15,27,47,0.97); /* solid backing so the open menu doesn't fade into the hero image */
+    position:relative;
+    z-index:2;
+    max-height:420px;
+    opacity:1;
+    margin-top:12px;
+    padding:4px 4px;
+    border-radius:2px;
+  }
+  .hero-nav-links a{
+    width:100%;
+    padding:11px 4px;
+    border-bottom:1px solid rgba(217,184,118,0.15);
+  }
+  .hero-nav-links a:last-child{border-bottom:none;}
+}
+
+@media (min-width:721px){
+  /* Defensive: guarantee the mobile toggle/panel state never leaks
+     into desktop, even if a stale "open" class or cached CSS lingers. */
+  .hero-nav-bar{display:none !important;}
+  .hero-nav-links{
+    display:flex !important;
+    max-height:none !important;
+    opacity:1 !important;
+    overflow:visible !important;
+    margin-top:0 !important;
+    background:none !important;
+  }
+}
+
+/* Ornamental frame around the portrait — no longer used in the hero
+   markup (the banner image includes its own portrait), kept here in
+   case it's reused elsewhere or the banner is swapped out later. */
 .hero-portrait{
   position:relative;
   display:flex;
@@ -120,7 +260,7 @@ img{max-width:100%;display:block;}
 .eyebrow{
   font-family:'Cormorant Garamond', serif;
   font-style:italic;
-  font-size:20px;
+  font-size:65px;
   color:var(--gold-light);
   margin-bottom:18px;
 }
@@ -153,24 +293,6 @@ img{max-width:100%;display:block;}
   font-size:18px;
   border-left:1px solid var(--rule);
   padding-left:18px;
-}
-.hero-nav{margin-top:36px; display:flex; gap:28px; flex-wrap:wrap; font-size:16px;}
-.hero-nav a{
-  text-decoration:none;
-  color:#e8e3d3;
-  border-bottom:1px solid transparent;
-  padding-bottom:3px;
-  transition:border-color .2s ease, color .2s ease;
-}
-.hero-nav a:hover{border-color:var(--gold-light); color:var(--gold-light);}
-.hero-nav a.active{border-color:var(--gold-light); color:var(--gold-light);}
-
-@media (max-width:720px){
-  .hero-inner{grid-template-columns:1fr; text-align:center; padding:64px 24px 52px;}
-  .hero-portrait{max-width:280px;margin:0 auto;}
-  .hero-verse{margin-left:auto;margin-right:auto; border-left:none; border-top:1px solid var(--rule); padding-left:0; padding-top:14px;}
-  .hero-dates{justify-content:center;}
-  .hero-nav{justify-content:center;}
 }
 
 /* ---------- SECTION SCAFFOLDING ---------- */
@@ -230,7 +352,7 @@ section{padding:88px 0;}
 .gallery{background:var(--ivory);}
 .gallery-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:4px;}
 .gallery-tile{aspect-ratio:4/5; background:linear-gradient(160deg,#e7e0cd,#d9d0b6); display:flex; align-items:center; justify-content:center; color:var(--ink-soft); font-family:'Cormorant Garamond', serif; font-style:italic; font-size:15px; text-align:center; padding:14px; overflow:hidden;}
-.gallery-tile img{width:100%;height:100%;object-fit:cover;}
+.gallery-tile img{width:100%;height:100%;object-fit:contain;} /* was cover — contain shows the full photo instead of cropping it to fill the box */
 @media (max-width:640px){.gallery-grid{grid-template-columns:repeat(2,1fr);}}
 
 /* ---------- TRIBUTES ---------- */

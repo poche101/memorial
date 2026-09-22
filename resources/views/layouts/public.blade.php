@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{{ asset('css/tribute.css') }}">
+<link rel="stylesheet" href="{{ asset('css/tribute.css') }}?v={{ filemtime(public_path('css/tribute.css')) }}">
 
 <style>
 /* Elegant portrait frame — taller, gilded, with corner flourishes */
@@ -113,49 +113,34 @@
 <body>
 
 <header class="hero" id="top">
+  <img
+    class="hero-bg-img"
+    src="{{ $memorial->hero_background_path ? asset('storage/'.$memorial->hero_background_path) : asset('images/mem.png') }}"
+    alt="{{ trim(($memorial->title ?? '').' '.($memorial->name ?? '')) }}"
+  >
   <div class="hero-inner">
-   <div class="hero-portrait">
-      <div class="frame-glow"></div>
-      <div class="flourish">
-        <svg viewBox="0 0 240 34" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
-          <path d="M18 17 H88"/>
-          <path d="M152 17 H222"/>
-          <path d="M120 6 V28"/>
-          <path d="M111 11 L120 6 L129 11"/>
-          <path d="M111 23 L120 28 L129 23"/>
-          <path d="M40 17 q7 -9 16 -6"/>
-          <path d="M56 17 q7 9 16 6"/>
-          <path d="M72 17 q7 -9 16 -6"/>
-          <path d="M200 17 q-7 -9 -16 -6"/>
-          <path d="M184 17 q-7 9 -16 6"/>
-          <path d="M168 17 q-7 -9 -16 -6"/>
-        </svg>
+    <nav class="hero-nav">
+      <div class="hero-nav-bar">
+        <button
+          type="button"
+          class="hero-nav-toggle"
+          id="heroNavToggle"
+          aria-expanded="false"
+          aria-controls="heroNavLinks"
+          aria-label="Toggle navigation menu"
+        >
+          <svg class="icon-menu" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+          <svg class="icon-close" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="6" y1="6" x2="18" y2="18"/>
+            <line x1="6" y1="18" x2="18" y2="6"/>
+          </svg>
+        </button>
       </div>
-      <div class="frame-metal">
-        <div class="frame-bevel">
-          <div class="frame-mat">
-            <div class="frame-photo">
-              @if($memorial->portrait_path ?? false)
-                <img src="{{ asset('storage/'.$memorial->portrait_path) }}" alt="Portrait of {{ $memorial->name }}">
-              @else
-                <img src="{{ asset('images/portrait-placeholder.jpg') }}" alt="Portrait">
-              @endif
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div>
-      <div class="eyebrow">Celebration of Life</div>
-      <h1 class="hero-name">{{ $memorial->title ?? '' }}<br>{{ $memorial->name ?? 'Loading' }}</h1>
-      <div class="hero-title">Beloved Father, Pastor &amp; Friend</div>
-      <div class="hero-dates">
-        <span>{{ $memorial->birth_date?->format('Y') }}</span><span class="dash"></span><span>{{ $memorial->death_date?->format('Y') }}</span>
-      </div>
-      @if($memorial->statement ?? false)
-      <p class="hero-verse">&ldquo;{{ $memorial->statement }}&rdquo;</p>
-      @endif
-      <nav class="hero-nav">
+      <div class="hero-nav-links" id="heroNavLinks">
         <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
         <a href="{{ route('biography') }}" class="{{ request()->routeIs('biography') ? 'active' : '' }}">Biography</a>
         <a href="{{ route('timeline') }}" class="{{ request()->routeIs('timeline') ? 'active' : '' }}">Life Timeline</a>
@@ -165,10 +150,120 @@
         @if($memorial->brochure_path ?? false)
         <a href="{{ route('brochure.download') }}">Download Brochure</a>
         @endif
-      </nav>
-    </div>
+      </div>
+    </nav>
   </div>
+
+  @if($memorial->song_path ?? false)
+    <audio id="memorial-song" loop preload="auto">
+      <source src="{{ asset('storage/'.$memorial->song_path) }}" type="audio/mpeg">
+    </audio>
+    <button id="music-toggle" class="music-toggle" aria-label="Pause tribute song" aria-pressed="false" type="button">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    </button>
+  @endif
 </header>
+
+<style>
+  .music-toggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 50;
+    backdrop-filter: blur(4px);
+  }
+  .music-toggle.playing svg { display: none; }
+  .music-toggle.playing::after { content: "❙❙"; font-size: 14px; letter-spacing: 2px; }
+</style>
+
+@if($memorial->song_path ?? false)
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const audio = document.getElementById('memorial-song');
+    const btn = document.getElementById('music-toggle');
+    if (!audio || !btn) return;
+
+    function setPlayingState(isPlaying) {
+      btn.classList.toggle('playing', isPlaying);
+      btn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+      btn.setAttribute('aria-label', isPlaying ? 'Pause tribute song' : 'Play tribute song');
+    }
+
+    function attemptPlay() {
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(function () {
+          setPlayingState(true);
+        }).catch(function () {
+          // Autoplay with sound was blocked by the browser. Start playback
+          // on the visitor's very first tap/click/keypress anywhere on the
+          // page instead — that counts as a user gesture, so it's allowed.
+          setPlayingState(false);
+          const startOnFirstInteraction = function () {
+            audio.play().then(function () { setPlayingState(true); }).catch(function () {});
+          };
+          document.addEventListener('click', startOnFirstInteraction, { once: true });
+          document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
+          document.addEventListener('keydown', startOnFirstInteraction, { once: true });
+        });
+      }
+    }
+
+    // Try to start the song as soon as the page loads.
+    attemptPlay();
+
+    // Manual toggle still works regardless of how playback started.
+    btn.addEventListener('click', function () {
+      if (audio.paused) {
+        audio.play().then(function () { setPlayingState(true); }).catch(function () {});
+      } else {
+        audio.pause();
+        setPlayingState(false);
+      }
+    });
+  });
+</script>
+@endif
+
+<script>
+  // Mobile hero-nav toggle
+  document.addEventListener('DOMContentLoaded', function () {
+    const navToggle = document.getElementById('heroNavToggle');
+    const navLinks = document.getElementById('heroNavLinks');
+    if (navToggle && navLinks) {
+      navToggle.addEventListener('click', function () {
+        const isOpen = navLinks.classList.toggle('open');
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+
+      // Close the menu after a link is tapped
+      navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          navLinks.classList.remove('open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+
+      // Collapse back to desktop layout on resize past the breakpoint
+      window.addEventListener('resize', function () {
+        if (window.innerWidth > 720) {
+          navLinks.classList.remove('open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+  });
+</script>
 
 @if(session('status'))
   <div class="container" style="padding-top:32px;"><div class="status-banner">{{ session('status') }}</div></div>
