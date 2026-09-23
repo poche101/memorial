@@ -78,15 +78,50 @@
 <style>
 /* Flexbox layout: reliable equal-height stretch across both columns,
    with the form given a larger share of the row than before. */
+.tributes {
+  padding: 56px 0;
+}
+
+.tributes .section-title {
+  margin-bottom: 24px;
+}
+
+.tributes .rule {
+  margin-bottom: 20px;
+}
+
 .tribute-layout {
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
-  gap: 56px;
+  gap: 40px;
 }
 
 .tribute-form {
   flex: 1.15 1 380px;
+  padding: 26px;
+}
+
+.tribute-form .field {
+  margin-bottom: 16px;
+}
+
+.tribute-form .field label {
+  font-size: 16px;
+}
+
+.tribute-form .field input,
+.tribute-form .field textarea {
+  font-size: 19px;
+}
+
+.tribute-form .consent {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+
+.tribute-form .submit-btn {
+  font-size: 19px;
 }
 
 .tribute-carousel-col {
@@ -102,7 +137,7 @@
   border: 1px solid rgba(169, 139, 79, 0.25);
   border-radius: 4px;
   box-shadow: 0 18px 40px -20px rgba(30, 25, 15, 0.35);
-  padding: 44px 40px 32px;
+  padding: 32px 30px 24px;
   flex: 1;
   min-height: 0;
   display: flex;
@@ -159,7 +194,7 @@
 
 .carousel-msg {
   font-family: 'EB Garamond', serif;
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.65;
   color: #33291b;
   font-style: italic;
@@ -169,7 +204,7 @@
 
 .carousel-who {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 15px;
+  font-size: 16px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #a98b4f;
@@ -184,7 +219,7 @@
   letter-spacing: 0;
   font-style: italic;
   color: #7a6a4f;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .carousel-empty p {
@@ -199,7 +234,7 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  margin-top: 28px;
+  margin-top: 20px;
 }
 
 .carousel-arrow {
