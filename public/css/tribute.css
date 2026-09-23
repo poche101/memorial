@@ -53,7 +53,7 @@ img{max-width:100%;display:block;}
   content:"";
   position:absolute;
   inset:0;
-  background:rgba(15,27,47,0.55);
+  background:rgba(180,210,240,0.22);
   z-index:0;
   pointer-events:none;
 }
@@ -97,11 +97,12 @@ img{max-width:100%;display:block;}
   width:40px;
   height:40px;
   padding:0;
-  background:transparent;
-  border:1px solid rgba(217,184,118,0.45);
+  background:rgba(15,27,47,0.65);
+  border:1px solid rgba(217,184,118,0.6);
   border-radius:2px;
   color:var(--gold-light);
   cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,0.25);
 }
 .hero-nav-toggle .icon-close{display:none;}
 .hero-nav-toggle[aria-expanded="true"] .icon-menu{display:none;}
