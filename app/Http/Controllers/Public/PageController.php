@@ -92,7 +92,7 @@ class PageController extends Controller
             'email' => ['nullable', 'email', 'max:150'],
             'relationship' => ['nullable', 'string', 'max:150'],
             'title' => ['nullable', 'string', 'max:150'],
-            'message' => ['required', 'string', 'max:3000'],
+            'message' => ['required', 'string'],
             'image' => ['nullable', 'image', 'max:4096'],
             'publication_consent' => ['required', 'accepted'],
             // Honeypot spam field: must stay empty.

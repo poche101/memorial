@@ -113,11 +113,39 @@
 <body>
 
 <header class="hero" id="top">
-  <img
-    class="hero-bg-img"
-    src="{{ $memorial->hero_background_path ? asset('storage/'.$memorial->hero_background_path) : asset('images/mem.png') }}"
-    alt="{{ trim(($memorial->title ?? '').' '.($memorial->name ?? '')) }}"
-  >
+  <div class="hero-slides">
+    <div class="hero-slide active" style="background-image:url('{{ asset('images/img1.jpeg') }}');"></div>
+    <div class="hero-slide" style="background-image:url('{{ asset('images/img2.jpeg') }}');"></div>
+    <div class="hero-slide" style="background-image:url('{{ asset('images/img3.jpeg') }}');"></div>
+    <div class="hero-slide" style="background-image:url('{{ asset('images/img4.jpeg') }}');"></div>
+    <div class="hero-slide" style="background-image:url('{{ asset('images/img5.jpeg') }}');"></div>
+    <div class="hero-slide" style="background-image:url('{{ asset('images/img6.jpeg') }}');"></div>
+  </div>
+
+  <div class="hero-tint" aria-hidden="true"></div>
+  <div class="hero-vignette" aria-hidden="true"></div>
+
+  <div class="hero-slide-content">
+    <p class="hero-eyebrow">CELEBRATION <span class="hero-eyebrow-script">of</span> LIFE</p>
+    <p class="hero-role">{{ $memorial->title }}</p>
+    <h1 class="hero-fullname">{{ $memorial->name }}</h1>
+    <div class="hero-dates-row">
+      <span class="hero-dash" aria-hidden="true"></span>
+      <span>{{ $memorial->birth_date?->format('Y') }} &ndash; {{ $memorial->death_date?->format('Y') }}</span>
+      <span class="hero-dash" aria-hidden="true"></span>
+    </div>
+    <p class="hero-age-badge">AGED 61 YEARS</p>
+  </div>
+
+  <div class="hero-dots" role="tablist" aria-label="Hero image slides">
+    <button type="button" class="hero-dot active" data-slide="0" aria-label="Show slide 1"></button>
+    <button type="button" class="hero-dot" data-slide="1" aria-label="Show slide 2"></button>
+    <button type="button" class="hero-dot" data-slide="2" aria-label="Show slide 3"></button>
+    <button type="button" class="hero-dot" data-slide="3" aria-label="Show slide 4"></button>
+    <button type="button" class="hero-dot" data-slide="4" aria-label="Show slide 5"></button>
+    <button type="button" class="hero-dot" data-slide="5" aria-label="Show slide 6"></button>
+  </div>
+
   <div class="hero-inner">
     <nav class="hero-nav">
       <div class="hero-nav-bar">
@@ -234,6 +262,49 @@
   });
 </script>
 @endif
+
+<script>
+  // Hero image slideshow: auto-rotate with cross-fade, dots for manual control
+  document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.hero-slide');
+    const dots = document.querySelectorAll('.hero-dot');
+    if (slides.length <= 1) return;
+
+    let current = 0;
+    let timer = null;
+    const intervalMs = 6000;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function showSlide(i) {
+      slides.forEach(function (s, idx) { s.classList.toggle('active', idx === i); });
+      dots.forEach(function (d, idx) { d.classList.toggle('active', idx === i); });
+      current = i;
+    }
+
+    function nextSlide() {
+      showSlide((current + 1) % slides.length);
+    }
+
+    function startAutoplay() {
+      if (prefersReducedMotion) return; // respect reduced-motion: no auto-advance
+      stopAutoplay();
+      timer = setInterval(nextSlide, intervalMs);
+    }
+
+    function stopAutoplay() {
+      if (timer) clearInterval(timer);
+    }
+
+    dots.forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        showSlide(parseInt(dot.dataset.slide, 10));
+        startAutoplay(); // reset the timer after a manual click
+      });
+    });
+
+    startAutoplay();
+  });
+</script>
 
 <script>
   // Mobile hero-nav toggle

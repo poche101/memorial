@@ -36,38 +36,159 @@ img{max-width:100%;display:block;}
 .container{max-width:1040px;margin:0 auto;padding:0 32px;}
 
 /* ---------- HERO ---------- */
-/* Real <img> element (not a CSS background) so the full banner always
-   displays at its native ratio with no cropping/letterboxing math.
-   The nav sits in an absolutely-positioned bar pinned to the bottom,
-   with its own dark gradient confined to just that strip. */
+/* A rotating photo slideshow. Text is real HTML layered on top (not
+   baked into any image), so slides can crop/fill freely via
+   object-fit/cover without ever risking cut-off text. */
 .hero{
   position:relative;
   width:100%;
-  overflow:visible; /* was hidden — let the mobile dropdown extend past the image without being clipped */
-  line-height:0; /* removes whitespace gap under the inline img */
+  height:clamp(520px, 72vh, 780px);
+  overflow:visible; /* lets the mobile dropdown extend past the box without being clipped */
 }
 
-/* Semi-transparent dark blue overlay across the whole hero, sitting
-   above the background image but below the nav bar content. */
-.hero::before{
-  content:"";
+.hero-slides{
   position:absolute;
   inset:0;
-  background:rgba(180,210,240,0.22);
   z-index:0;
+  overflow:hidden;
+}
+.hero-slide{
+  position:absolute;
+  inset:0;
+  background-size:cover; /* fills the full width edge-to-edge, no letterbox bars */
+  background-position:center top;
+  opacity:0;
+  transition:opacity 1.6s ease;
+}
+.hero-slide.active{opacity:1;}
+
+/* Light-blue wash across the whole photo */
+.hero-tint{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:rgba(180,210,240,0.34);
+  pointer-events:none;
+}
+/* Deeper, focused darkening directly behind the text for legibility,
+   fading out toward the edges so the photo still reads clearly there */
+.hero-vignette{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  background:radial-gradient(ellipse at center, rgba(15,27,47,0.62) 0%, rgba(15,27,47,0.3) 45%, transparent 72%);
   pointer-events:none;
 }
 
-.hero-bg-img{
-  display:block;
-  width:100%;
-  height:auto;
+.hero-slide-content{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:32px 24px;
+  color:#fbf8f1;
+}
+.hero-eyebrow{
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic;
+  letter-spacing:0.28em;
+  font-size:clamp(24px, 4.2vw, 46px);
+  text-transform:uppercase;
+  color:#f3ede0;
+  margin:0 0 20px;
+}
+.hero-eyebrow-script{
+  font-style:italic;
+  text-transform:none;
+  letter-spacing:0;
+  color:var(--gold-light);
+  font-size:1.3em;
+  margin:0 3px;
+  position:relative;
+  top:2px;
+}
+.hero-role{
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic;
+  color:var(--gold-light);
+  font-size:clamp(16px, 2vw, 22px);
+  letter-spacing:0.14em;
+  text-transform:uppercase;
+  margin:0 0 6px;
+}
+.hero-fullname{
+  font-family:'Cormorant Garamond', serif;
+  font-weight:600;
+  font-size:clamp(34px, 6vw, 72px);
+  line-height:1.05;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  color:#fbf8f1;
+  max-width:16ch;
+  text-shadow:0 4px 18px rgba(0,0,0,0.35);
+  margin:0;
+}
+.hero-dates-row{
+  margin-top:22px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:clamp(16px, 2vw, 22px);
+  color:#e7e1d0;
+  letter-spacing:0.08em;
+}
+.hero-dash{width:34px; height:1px; background:var(--gold-light);}
+.hero-age-badge{
+  margin:20px 0 0;
+  background:linear-gradient(120deg, var(--navy-soft), var(--navy-deep));
+  color:#ffffff;
+  font-family:'EB Garamond', serif;
+  font-weight:600;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  font-size:clamp(13px, 1.4vw, 16px);
+  padding:9px 26px;
+  border-radius:1px;
+}
+
+.hero-dots{
+  position:absolute;
+  left:50%;
+  bottom:22px;
+  transform:translateX(-50%);
+  z-index:2;
+  display:flex;
+  gap:10px;
+}
+.hero-dot{
+  width:9px; height:9px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.4);
+  border:1px solid rgba(255,255,255,0.65);
+  padding:0;
+  cursor:pointer;
+  transition:background .2s ease, transform .2s ease;
+}
+.hero-dot.active{background:var(--gold-light); border-color:var(--gold-light); transform:scale(1.2);}
+
+@media (min-width:721px){
+  /* Keep the dots clear of the desktop nav bar, which is pinned to
+     the very bottom of the hero. */
+  .hero-dots{bottom:108px;}
+}
+
+@media (max-width:720px){
+  .hero{height:clamp(420px, 62vh, 640px);}
 }
 
 .hero-inner{
   position:absolute;
   inset:0;
-  z-index:1;
+  z-index:3;
   display:flex;
   align-items:flex-end; /* nav pinned to the very bottom edge */
 }
