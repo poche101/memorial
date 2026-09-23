@@ -276,20 +276,116 @@
   transform: scale(1.25);
 }
 
+@media (max-width: 1024px) {
+  .tribute-layout {
+    gap: 32px;
+  }
+}
+
 @media (max-width: 768px) {
+  .tributes {
+    padding: 48px 0;
+  }
+
   .tribute-layout {
     flex-direction: column;
+    gap: 32px;
   }
 
   .tribute-form,
   .tribute-carousel-col {
     flex: none;
+    width: 100%;
   }
 
   .tribute-carousel {
-    padding: 32px 24px 24px;
-    min-height: 340px;
+    padding: 28px 24px 20px;
+    min-height: 300px;
     flex: none;
+  }
+
+  .carousel-quote-mark {
+    font-size: 52px;
+  }
+
+  .carousel-msg {
+    font-size: 18px;
+  }
+
+  .carousel-photo {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tributes {
+    padding: 36px 0;
+  }
+
+  .tributes .container {
+    padding: 0 20px;
+  }
+
+  .tributes .section-title {
+    margin-bottom: 18px;
+  }
+
+  .tribute-form {
+    padding: 20px;
+  }
+
+  .tribute-form .field {
+    margin-bottom: 14px;
+  }
+
+  .tribute-form .field input,
+  .tribute-form .field textarea {
+    font-size: 17px;
+  }
+
+  .tribute-form .submit-btn {
+    width: 100%;
+    font-size: 17px;
+    padding: 12px 20px;
+  }
+
+  .tribute-carousel {
+    padding: 22px 18px 18px;
+    min-height: 260px;
+  }
+
+  .carousel-quote-mark {
+    font-size: 42px;
+  }
+
+  .carousel-photo {
+    width: 68px;
+    height: 68px;
+    margin: 4px 0 14px;
+  }
+
+  .carousel-msg {
+    font-size: 16px;
+  }
+
+  .carousel-who {
+    font-size: 14px;
+  }
+
+  .carousel-rel {
+    font-size: 13px;
+  }
+
+  .carousel-arrow {
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+  }
+
+  .carousel-controls {
+    gap: 14px;
+    margin-top: 16px;
   }
 }
 </style>
