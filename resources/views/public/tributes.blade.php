@@ -76,21 +76,24 @@
 </section>
 
 <style>
-/* Widen the right column relative to the form, and stretch both to equal height */
+/* Flexbox layout: reliable equal-height stretch across both columns,
+   with the form given a larger share of the row than before. */
 .tribute-layout {
+  display: flex;
+  flex-wrap: wrap;
   align-items: stretch;
-  grid-template-columns: 1fr 1.35fr;
+  gap: 56px;
 }
 
 .tribute-form {
-  height: 100%;
+  flex: 1.15 1 380px;
 }
 
 .tribute-carousel-col {
+  flex: 1 1 380px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-  height: 100%;
 }
 
 .tribute-carousel {
@@ -240,12 +243,12 @@
 
 @media (max-width: 768px) {
   .tribute-layout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
   }
 
   .tribute-form,
   .tribute-carousel-col {
-    height: auto;
+    flex: none;
   }
 
   .tribute-carousel {
