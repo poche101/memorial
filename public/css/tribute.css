@@ -36,9 +36,9 @@ img{max-width:100%;display:block;}
 .container{max-width:1040px;margin:0 auto;padding:0 32px;}
 
 /* ---------- HERO ---------- */
-/* A rotating photo slideshow. Text is real HTML layered on top (not
-   baked into any image), so slides can crop/fill freely via
-   object-fit/cover without ever risking cut-off text. */
+/* A looping muted video sits behind the hero. Text is real HTML layered
+   on top (not baked into any image), so the video can crop/fill freely
+   via object-fit/cover without ever risking cut-off text. */
 .hero{
   position:relative;
   width:100%;
@@ -46,23 +46,23 @@ img{max-width:100%;display:block;}
   overflow:visible; /* lets the mobile dropdown extend past the box without being clipped */
 }
 
-.hero-slides{
+.hero-media{
   position:absolute;
   inset:0;
   z-index:0;
   overflow:hidden;
+  background-color:#1a140b;
 }
-.hero-slide{
-  position:absolute;
-  inset:0;
-  background-size:cover; /* fills the full width edge-to-edge, no letterbox bars */
-  background-position:center top;
-  opacity:0;
-  transition:opacity 1.6s ease;
+.hero-media video,
+.hero-media img{
+  width:100%;
+  height:100%;
+  object-fit:cover; /* fills the full width edge-to-edge, no letterbox bars */
+  object-position:center top;
+  display:block;
 }
-.hero-slide.active{opacity:1;}
 
-/* Light-blue wash across the whole photo */
+/* Light-blue wash across the whole video */
 .hero-tint{
   position:absolute;
   inset:0;
@@ -71,7 +71,7 @@ img{max-width:100%;display:block;}
   pointer-events:none;
 }
 /* Deeper, focused darkening directly behind the text for legibility,
-   fading out toward the edges so the photo still reads clearly there */
+   fading out toward the edges so the video still reads clearly there */
 .hero-vignette{
   position:absolute;
   inset:0;
@@ -153,32 +153,6 @@ img{max-width:100%;display:block;}
   font-size:clamp(13px, 1.4vw, 16px);
   padding:9px 26px;
   border-radius:1px;
-}
-
-.hero-dots{
-  position:absolute;
-  left:50%;
-  bottom:22px;
-  transform:translateX(-50%);
-  z-index:2;
-  display:flex;
-  gap:10px;
-}
-.hero-dot{
-  width:9px; height:9px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.4);
-  border:1px solid rgba(255,255,255,0.65);
-  padding:0;
-  cursor:pointer;
-  transition:background .2s ease, transform .2s ease;
-}
-.hero-dot.active{background:var(--gold-light); border-color:var(--gold-light); transform:scale(1.2);}
-
-@media (min-width:721px){
-  /* Keep the dots clear of the desktop nav bar, which is pinned to
-     the very bottom of the hero. */
-  .hero-dots{bottom:108px;}
 }
 
 @media (max-width:720px){
@@ -284,7 +258,7 @@ img{max-width:100%;display:block;}
     transition:max-height .3s ease, opacity .25s ease, margin-top .3s ease;
   }
   .hero-nav-links.open{
-    background:rgba(15,27,47,0.97); /* solid backing so the open menu doesn't fade into the hero image */
+    background:rgba(15,27,47,0.97); /* solid backing so the open menu doesn't fade into the hero video */
     position:relative;
     z-index:2;
     max-height:420px;
