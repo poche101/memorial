@@ -69,7 +69,7 @@
           @endif
         </div>
 
-        <div class="pagination">{{ $tributes->links() }}</div>
+        <div class="pagination">{{ $tributes->links('vendor.pagination.tribute') }}</div>
       </div>
     </div>
   </div>
@@ -269,6 +269,48 @@
 .carousel-dots button.is-active {
   background: #a98b4f;
   transform: scale(1.25);
+}
+
+.tp-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tp-btn {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(169, 139, 79, 0.4);
+  border-radius: 50%;
+  color: #a98b4f;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  text-decoration: none;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+a.tp-btn:hover {
+  background: #a98b4f;
+  color: #fdfbf7;
+}
+
+.tp-btn.is-current {
+  background: #a98b4f;
+  color: #fdfbf7;
+}
+
+.tp-btn.is-disabled {
+  opacity: 0.35;
+}
+
+.tp-dots {
+  color: #a98b4f;
 }
 
 @media (max-width: 1024px) {
