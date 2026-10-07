@@ -76,8 +76,8 @@
 </section>
 
 <style>
-/* Flexbox layout: reliable equal-height stretch across both columns,
-   with the form given a larger share of the row than before. */
+/* Layout: columns keep their own height (no stretching), so the tribute
+   card is only as tall as the tribute it is showing. */
 .tributes {
   padding: 56px 0;
 }
@@ -93,7 +93,7 @@
 .tribute-layout {
   display: flex;
   flex-wrap: wrap;
-  align-items: stretch;
+  align-items: flex-start;
   gap: 40px;
 }
 
@@ -137,25 +137,20 @@
   border: 1px solid rgba(169, 139, 79, 0.25);
   border-radius: 4px;
   box-shadow: 0 18px 40px -20px rgba(30, 25, 15, 0.35);
-  padding: 32px 30px 24px;
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  padding: 20px 22px 16px;
+  flex: none;
 }
 
 .carousel-viewport {
   overflow: hidden;
   position: relative;
-  flex: 1;
-  min-height: 0;
+  transition: height 0.4s ease;
 }
 
 .carousel-track {
   display: flex;
+  align-items: flex-start;
   transition: transform 0.55s cubic-bezier(0.65, 0, 0.35, 1);
-  height: 100%;
 }
 
 .carousel-slide {
@@ -163,9 +158,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   text-align: center;
-  padding: 0 8px;
+  padding: 0;
   opacity: 0;
   transition: opacity 0.4s ease;
 }
@@ -176,10 +171,10 @@
 
 .carousel-quote-mark {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 64px;
-  line-height: 1;
+  font-size: 44px;
+  line-height: 0.8;
   color: #a98b4f;
-  margin-bottom: -6px;
+  margin-bottom: 0;
 }
 
 .carousel-photo {
@@ -187,24 +182,24 @@
   height: 96px;
   object-fit: cover;
   border-radius: 50%;
-  margin: 8px 0 18px;
+  margin: 4px 0 12px;
   box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.35);
   border: 3px solid #fdfbf7;
 }
 
 .carousel-msg {
   font-family: 'EB Garamond', serif;
-  font-size: 20px;
-  line-height: 1.65;
+  font-size: 24px;
+  line-height: 1.55;
   color: #33291b;
   font-style: italic;
-  max-width: 480px;
-  margin: 0 auto 20px;
+  max-width: none;
+  margin: 0 0 14px;
 }
 
 .carousel-who {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 16px;
+  font-size: 18px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: #a98b4f;
@@ -219,7 +214,7 @@
   letter-spacing: 0;
   font-style: italic;
   color: #7a6a4f;
-  font-size: 15px;
+  font-size: 17px;
 }
 
 .carousel-empty p {
@@ -234,7 +229,7 @@
   align-items: center;
   justify-content: center;
   gap: 18px;
-  margin-top: 20px;
+  margin-top: 14px;
 }
 
 .carousel-arrow {
@@ -299,17 +294,15 @@
   }
 
   .tribute-carousel {
-    padding: 28px 24px 20px;
-    min-height: 300px;
-    flex: none;
+    padding: 18px 16px 14px;
   }
 
   .carousel-quote-mark {
-    font-size: 52px;
+    font-size: 40px;
   }
 
   .carousel-msg {
-    font-size: 18px;
+    font-size: 21px;
   }
 
   .carousel-photo {
@@ -351,30 +344,29 @@
   }
 
   .tribute-carousel {
-    padding: 22px 18px 18px;
-    min-height: 260px;
+    padding: 16px 14px 12px;
   }
 
   .carousel-quote-mark {
-    font-size: 42px;
+    font-size: 36px;
   }
 
   .carousel-photo {
     width: 68px;
     height: 68px;
-    margin: 4px 0 14px;
+    margin: 4px 0 10px;
   }
 
   .carousel-msg {
-    font-size: 16px;
+    font-size: 19px;
   }
 
   .carousel-who {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .carousel-rel {
-    font-size: 13px;
+    font-size: 14px;
   }
 
   .carousel-arrow {
@@ -385,7 +377,7 @@
 
   .carousel-controls {
     gap: 14px;
-    margin-top: 16px;
+    margin-top: 12px;
   }
 }
 </style>
@@ -393,6 +385,7 @@
 <script>
 document.querySelectorAll('[data-carousel]').forEach(function (root) {
   var track = root.querySelector('[data-track]');
+  var viewport = root.querySelector('.carousel-viewport');
   var slides = Array.prototype.slice.call(root.querySelectorAll('[data-slide]'));
   if (!slides.length) return;
 
@@ -401,6 +394,11 @@ document.querySelectorAll('[data-carousel]').forEach(function (root) {
   var nextBtn = root.querySelector('[data-next]');
   var index = 0;
   var timer = null;
+
+  // Make the card exactly as tall as the tribute currently shown.
+  function fitHeight() {
+    viewport.style.height = slides[index].offsetHeight + 'px';
+  }
 
   if (dotsWrap) {
     slides.forEach(function (_, i) {
@@ -422,6 +420,7 @@ document.querySelectorAll('[data-carousel]').forEach(function (root) {
         dot.classList.toggle('is-active', i === index);
       });
     }
+    fitHeight();
   }
 
   function goTo(i) {
@@ -445,6 +444,13 @@ document.querySelectorAll('[data-carousel]').forEach(function (root) {
 
   root.addEventListener('mouseenter', stopAutoplay);
   root.addEventListener('mouseleave', startAutoplay);
+
+  // Heights change when the window resizes, fonts load, or photos appear.
+  window.addEventListener('resize', fitHeight);
+  window.addEventListener('load', fitHeight);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fitHeight);
+  }
 
   render();
   startAutoplay();
