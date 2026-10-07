@@ -181,4 +181,17 @@ class PageController extends Controller
 
         return back()->with('status', 'Thank you for reaching out. The family office will respond as soon as possible.');
     }
+
+    public function brochureLanding(): View|RedirectResponse
+{
+    $memorial = $this->memorial();
+
+    // If there's no brochure yet, just send people to the home page.
+    if (! $memorial->brochure_path
+        || ! Storage::disk('public')->exists($memorial->brochure_path)) {
+        return redirect()->route('home');
+    }
+
+    return view('public.brochure-landing', ['memorial' => $memorial]);
+}
 }

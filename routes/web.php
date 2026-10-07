@@ -23,8 +23,8 @@ Route::get('/biography', [PageController::class, 'biography'])->name('biography'
 Route::get('/timeline', [PageController::class, 'timeline'])->name('timeline');
 Route::get('/gallery', [PageController::class, 'gallery'])->name('gallery');
 Route::get('/events', [PageController::class, 'events'])->name('events');
-Route::get('/brochure', [PageController::class, 'downloadBrochure'])->name('brochure.download');
-
+Route::get('/brochure', [PageController::class, 'brochureLanding'])->name('brochure.landing');
+Route::get('/brochure/download', [PageController::class, 'downloadBrochure'])->name('brochure.download');
 Route::get('/tributes', [PageController::class, 'tributes'])->name('tributes.index');
 Route::post('/tributes', [PageController::class, 'storeTribute'])
     ->middleware('throttle:6,1')
