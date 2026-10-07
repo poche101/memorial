@@ -90,15 +90,17 @@
   margin-bottom: 20px;
 }
 
+/* Two equal columns. minmax(0, 1fr) stops the long tribute text from
+   forcing the carousel column wider than the form. */
 .tribute-layout {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
   gap: 40px;
 }
 
 .tribute-form {
-  flex: 1.15 1 380px;
+  min-width: 0;
   padding: 26px;
 }
 
@@ -125,7 +127,7 @@
 }
 
 .tribute-carousel-col {
-  flex: 1 1 380px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -325,14 +327,8 @@ a.tp-btn:hover {
   }
 
   .tribute-layout {
-    flex-direction: column;
+    grid-template-columns: minmax(0, 1fr);
     gap: 32px;
-  }
-
-  .tribute-form,
-  .tribute-carousel-col {
-    flex: none;
-    width: 100%;
   }
 
   .tribute-carousel {
