@@ -6,11 +6,13 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\MemorialController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\StreamController as AdminStreamController;
 use App\Http\Controllers\Admin\TimelineEntryController;
 use App\Http\Controllers\Admin\TributeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Public\PageController;
+use App\Http\Controllers\StreamStatusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +40,9 @@ Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'storeContact'])
     ->middleware('throttle:6,1')
     ->name('contact.store');
+
+// Livestream status endpoint
+Route::get('/stream/status', StreamStatusController::class)->name('stream.status');
 
 /*
 |--------------------------------------------------------------------------
@@ -98,6 +103,13 @@ Route::prefix('admin')->name('admin.')->middleware('auth')->group(function () {
         Route::resource('events', EventController::class)
             ->except(['show']);
         Route::post('/events/{event}/toggle-publish', [EventController::class, 'togglePublish'])->name('events.toggle-publish');
+    });
+
+    Route::middleware('role:super_admin,memorial_editor,event_manager')->group(function () {
+        Route::get('stream', [AdminStreamController::class, 'edit'])->name('stream.edit');
+        Route::put('stream', [AdminStreamController::class, 'update'])->name('stream.update');
+        Route::post('stream/go-live', [AdminStreamController::class, 'goLive'])->name('stream.live');
+        Route::post('stream/end', [AdminStreamController::class, 'end'])->name('stream.end');
     });
 
     Route::middleware('role:super_admin')->group(function () {

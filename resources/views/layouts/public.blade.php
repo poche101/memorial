@@ -1,3 +1,8 @@
+@php
+  // Livestream data comes from the admin "Live Stream" page.
+  $stream     = \App\Support\StreamEmbed::resolve($memorial ?? null);
+  $streamLive = $stream && $stream['live'] && $stream['mode'];
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,44 +24,7 @@
 <link rel="stylesheet" href="{{ asset('css/tribute.css') }}?v={{ filemtime(public_path('css/tribute.css')) }}">
 
 <style>
-/* ---------- Hero video: full width, whole video visible ---------- */
-.hero {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  height: auto;            /* height comes from the video's 16:9 shape */
-  overflow: visible;       /* lets the mobile dropdown extend past the video */
-}
-
-.hero-media {
-  position: relative;
-  width: 100%;
-  height: clamp(420px, 72vh, 760px);   /* change these numbers to taste */
-  overflow: hidden;
-  z-index: 0;
-  background: #0f1b2f url('{{ asset('images/img1.jpeg') }}') center / cover no-repeat;
-}
-
-.hero-media video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 35%;   /* lower % crops more from the top, higher % crops more from the bottom */
-  display: block;
-}
-
-/* Phones: keep the full video visible, since a narrow screen has no height to spare */
-@media (max-width: 720px) {
-  .hero-media {
-    height: auto;
-    aspect-ratio: 16 / 9;
-  }
-  .hero-media video {
-    object-position: center center;
-  }
-}
-
-/* Elegant portrait frame — taller, gilded, with corner flourishes */
+/* Elegant portrait frame (kept in case other pages use it) */
 .hero-portrait {
   width: 280px;
   height: 360px;
@@ -103,7 +71,6 @@
   position: relative;
 }
 
-/* Delicate corner flourishes on the mat */
 .frame-mat::before,
 .frame-mat::after,
 .frame-mat > .frame-photo::before,
@@ -135,9 +102,7 @@
   filter: sepia(8%) saturate(92%);
 }
 
-.flourish {
-  color: #a9863f;
-}
+.flourish { color: #a9863f; }
 
 @media (max-width: 640px) {
   .hero-portrait {
@@ -145,166 +110,271 @@
     height: 300px;
   }
 }
+
+/* ---------- Livestream player (full width) ---------- */
+.stream-hero {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #1a140a;
+}
+
+.stream-panel {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  color: #fdfbf5;
+  border-bottom: 6px solid #a9863f;
+}
+
+.stream-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  flex-wrap: wrap;
+}
+
+.stream-head h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: #f4e6bd;
+}
+
+.stream-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font: 600 11px/1.4 'EB Garamond', Georgia, serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  background: #a9863f;
+  color: #fff;
+}
+
+.stream-badge.is-live { background: #c0392b; }
+.stream-badge.is-live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  animation: streamPulse 1.4s infinite;
+}
+
+@keyframes streamPulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+
+/* Full width, height capped so it is not huge on wide monitors.
+   Change the numbers in clamp(min, preferred, max) to taste. */
+.stream-screen {
+  position: relative;
+  width: 100%;
+  height: clamp(300px, 60vh, 560px);
+  background: #000;
+  overflow: hidden;
+}
+
+/* Phones: go back to a true 16:9 shape */
+@media (max-width: 720px) {
+  .stream-screen {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  .stream-head { padding: 10px 14px; }
+}
+
+.stream-screen iframe,
+.stream-screen video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.stream-wait {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  background: radial-gradient(circle at center, #2b2213 0%, #0f0b05 100%);
+}
+
+.stream-wait .wait-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(1.1rem, 3vw, 1.8rem);
+  color: #f4e6bd;
+}
+
+.stream-wait .wait-when,
+.stream-wait .wait-count {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: clamp(.9rem, 2vw, 1.1rem);
+  color: #d9ccaa;
+}
+
+.stream-wait .wait-count { font-variant-numeric: tabular-nums; letter-spacing: .06em; }
+
+.stream-desc {
+  margin: 0;
+  padding: 12px 20px 16px;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #d9ccaa;
+}
+
+/* ---------- Tribute song button ---------- */
+.music-toggle {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 50;
+  backdrop-filter: blur(4px);
+}
+.music-toggle.playing svg { display: none; }
+.music-toggle.playing::after { content: "❙❙"; font-size: 14px; letter-spacing: 2px; }
 </style>
 </head>
 <body>
 
-<header class="hero" id="top">
-  <div class="hero-media" aria-hidden="true">
-    <video autoplay muted loop playsinline preload="auto" poster="{{ asset('images/img1.jpeg') }}">
-      <source src="{{ asset('images/hero.mp4') }}" type="video/mp4">
-    </video>
-  </div>
+{{-- LIVESTREAM PLAYER (managed from Admin > Live Stream), full width --}}
+@if($stream)
+<header class="stream-hero" id="top">
+  <section class="stream-panel" id="stream" aria-label="Livestream">
+    <div class="stream-head">
+      <span class="stream-badge {{ $streamLive ? 'is-live' : '' }}">{{ $streamLive ? 'Live' : 'Upcoming' }}</span>
+      <h2>{{ $stream['title'] }}</h2>
+    </div>
 
-  <div class="hero-tint" aria-hidden="true"></div>
-  <div class="hero-vignette" aria-hidden="true"></div>
+    <div class="stream-screen">
+      @if($streamLive)
+        @include('partials.stream-player', ['stream' => $stream])
+      @else
+        <div class="stream-wait">
+          <div class="wait-title">The stream will begin shortly</div>
+          @if($stream['starts_at'])
+            <div class="wait-when">{{ $stream['starts_at']->format('l, j F Y \a\t g:i A') }}</div>
+            <div class="wait-count" id="streamCountdown" data-start="{{ $stream['starts_at']->toIso8601String() }}"></div>
+          @else
+            <div class="wait-when">Please stay on this page. The player will appear automatically.</div>
+          @endif
+        </div>
+      @endif
+    </div>
 
-  <div class="hero-inner">
-    <nav class="hero-nav">
-      <div class="hero-nav-bar">
-        <button
-          type="button"
-          class="hero-nav-toggle"
-          id="heroNavToggle"
-          aria-expanded="false"
-          aria-controls="heroNavLinks"
-          aria-label="Toggle navigation menu"
-        >
-          <svg class="icon-menu" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="6" x2="21" y2="6"/>
-            <line x1="3" y1="12" x2="21" y2="12"/>
-            <line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-          <svg class="icon-close" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="6" y1="6" x2="18" y2="18"/>
-            <line x1="6" y1="18" x2="18" y2="6"/>
-          </svg>
-        </button>
-      </div>
-      <div class="hero-nav-links" id="heroNavLinks">
-        <a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">Home</a>
-        <a href="{{ route('biography') }}" class="{{ request()->routeIs('biography') ? 'active' : '' }}">Biography</a>
-        <a href="{{ route('timeline') }}" class="{{ request()->routeIs('timeline') ? 'active' : '' }}">Life Timeline</a>
-        <a href="{{ route('events') }}" class="{{ request()->routeIs('events') ? 'active' : '' }}">Arrangements</a>
-        <a href="{{ route('gallery') }}" class="{{ request()->routeIs('gallery') ? 'active' : '' }}">Gallery</a>
-        <a href="{{ route('tributes.index') }}" class="{{ request()->routeIs('tributes.*') ? 'active' : '' }}">Tributes</a>
-        @if($memorial->brochure_path ?? false)
-        <a href="{{ route('brochure.download') }}">Download Brochure</a>
-        @endif
-      </div>
-    </nav>
-  </div>
-
-  @if($memorial->song_path ?? false)
-    <audio id="memorial-song" loop preload="auto">
-      <source src="{{ asset('storage/'.$memorial->song_path) }}" type="audio/mpeg">
-    </audio>
-    <button id="music-toggle" class="music-toggle" aria-label="Pause tribute song" aria-pressed="false" type="button">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-    </button>
-  @endif
+    @if($stream['description'])
+      <p class="stream-desc">{{ $stream['description'] }}</p>
+    @endif
+  </section>
 </header>
+@endif
 
-<style>
-  .music-toggle {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: none;
-    background: rgba(0, 0, 0, 0.6);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 50;
-    backdrop-filter: blur(4px);
-  }
-  .music-toggle.playing svg { display: none; }
-  .music-toggle.playing::after { content: "❙❙"; font-size: 14px; letter-spacing: 2px; }
-</style>
+@if(($memorial->song_path ?? false) && ! $streamLive)
+  {{-- The tribute song is skipped while the stream is live so the two audio sources do not clash. --}}
+  <audio id="memorial-song" loop preload="auto">
+    <source src="{{ asset('storage/'.$memorial->song_path) }}" type="audio/mpeg">
+  </audio>
+  <button id="music-toggle" class="music-toggle" aria-label="Pause tribute song" aria-pressed="false" type="button">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+  </button>
 
-@if($memorial->song_path ?? false)
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const audio = document.getElementById('memorial-song');
-    const btn = document.getElementById('music-toggle');
-    if (!audio || !btn) return;
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const audio = document.getElementById('memorial-song');
+      const btn = document.getElementById('music-toggle');
+      if (!audio || !btn) return;
 
-    function setPlayingState(isPlaying) {
-      btn.classList.toggle('playing', isPlaying);
-      btn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
-      btn.setAttribute('aria-label', isPlaying ? 'Pause tribute song' : 'Play tribute song');
-    }
+      function setPlayingState(isPlaying) {
+        btn.classList.toggle('playing', isPlaying);
+        btn.setAttribute('aria-pressed', isPlaying ? 'true' : 'false');
+        btn.setAttribute('aria-label', isPlaying ? 'Pause tribute song' : 'Play tribute song');
+      }
 
-    function attemptPlay() {
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.then(function () {
-          setPlayingState(true);
-        }).catch(function () {
-          // Autoplay with sound was blocked by the browser. Start playback
-          // on the visitor's very first tap/click/keypress anywhere on the
-          // page instead — that counts as a user gesture, so it's allowed.
+      function attemptPlay() {
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function () {
+            setPlayingState(true);
+          }).catch(function () {
+            // Autoplay with sound was blocked. Start on the first user gesture instead.
+            setPlayingState(false);
+            const startOnFirstInteraction = function () {
+              audio.play().then(function () { setPlayingState(true); }).catch(function () {});
+            };
+            document.addEventListener('click', startOnFirstInteraction, { once: true });
+            document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
+            document.addEventListener('keydown', startOnFirstInteraction, { once: true });
+          });
+        }
+      }
+
+      attemptPlay();
+
+      btn.addEventListener('click', function () {
+        if (audio.paused) {
+          audio.play().then(function () { setPlayingState(true); }).catch(function () {});
+        } else {
+          audio.pause();
           setPlayingState(false);
-          const startOnFirstInteraction = function () {
-            audio.play().then(function () { setPlayingState(true); }).catch(function () {});
-          };
-          document.addEventListener('click', startOnFirstInteraction, { once: true });
-          document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
-          document.addEventListener('keydown', startOnFirstInteraction, { once: true });
-        });
-      }
+        }
+      });
+    });
+  </script>
+@endif
+
+@if($stream && ! $streamLive)
+<script>
+  // Waiting card: countdown + auto-switch to the player when the admin goes live
+  document.addEventListener('DOMContentLoaded', function () {
+    var el = document.getElementById('streamCountdown');
+    if (el) {
+      var target = new Date(el.getAttribute('data-start')).getTime();
+      var tick = function () {
+        var diff = target - Date.now();
+        if (diff <= 0) { el.textContent = 'Starting any moment now…'; return; }
+        var s = Math.floor(diff / 1000);
+        var d = Math.floor(s / 86400); s -= d * 86400;
+        var h = Math.floor(s / 3600);  s -= h * 3600;
+        var m = Math.floor(s / 60);    s -= m * 60;
+        var pad = function (n) { return String(n).padStart(2, '0'); };
+        el.textContent = 'Starts in ' + (d > 0 ? d + 'd ' : '') + pad(h) + 'h ' + pad(m) + 'm ' + pad(s) + 's';
+      };
+      tick();
+      setInterval(tick, 1000);
     }
 
-    // Try to start the song as soon as the page loads.
-    attemptPlay();
-
-    // Manual toggle still works regardless of how playback started.
-    btn.addEventListener('click', function () {
-      if (audio.paused) {
-        audio.play().then(function () { setPlayingState(true); }).catch(function () {});
-      } else {
-        audio.pause();
-        setPlayingState(false);
-      }
-    });
+    var checkLive = function () {
+      fetch(@json(route('stream.status')), { headers: { 'Accept': 'application/json' }, cache: 'no-store' })
+        .then(function (r) { return r.json(); })
+        .then(function (data) { if (data.live) { window.location.reload(); } })
+        .catch(function () {});
+    };
+    setInterval(checkLive, 30000);
   });
 </script>
 @endif
-
-<script>
-  // Mobile hero-nav toggle
-  document.addEventListener('DOMContentLoaded', function () {
-    const navToggle = document.getElementById('heroNavToggle');
-    const navLinks = document.getElementById('heroNavLinks');
-    if (navToggle && navLinks) {
-      navToggle.addEventListener('click', function () {
-        const isOpen = navLinks.classList.toggle('open');
-        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-      });
-
-      // Close the menu after a link is tapped
-      navLinks.querySelectorAll('a').forEach(function (link) {
-        link.addEventListener('click', function () {
-          navLinks.classList.remove('open');
-          navToggle.setAttribute('aria-expanded', 'false');
-        });
-      });
-
-      // Collapse back to desktop layout on resize past the breakpoint
-      window.addEventListener('resize', function () {
-        if (window.innerWidth > 720) {
-          navLinks.classList.remove('open');
-          navToggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-  });
-</script>
 
 @if(session('status'))
   <div class="container" style="padding-top:32px;"><div class="status-banner">{{ session('status') }}</div></div>

@@ -18,18 +18,31 @@ class Memorial extends Model
         'death_date',
         'portrait_path',
         'brochure_path',
+        'song_path',
         'statement',
         'biography',
         'status',
         'visibility_settings',
+        'stream_enabled',
+        'stream_is_live',
+        'stream_autoplay',
+        'stream_provider',
+        'stream_url',
+        'stream_title',
+        'stream_description',
+        'stream_starts_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'birth_date' => 'date',
-            'death_date' => 'date',
+            'birth_date'          => 'date',
+            'death_date'          => 'date',
             'visibility_settings' => 'array',
+            'stream_enabled'      => 'boolean',
+            'stream_is_live'      => 'boolean',
+            'stream_autoplay'     => 'boolean',
+            'stream_starts_at'    => 'datetime',
         ];
     }
 

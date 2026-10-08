@@ -1,5 +1,7 @@
 @extends('layouts.public')
+
 @section('title', 'Home')
+
 @section('content')
 
 <section class="bio" id="biography">

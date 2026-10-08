@@ -143,6 +143,10 @@ body {
         <a href="{{ route('admin.gallery.index') }}" class="{{ request()->routeIs('admin.gallery.*') ? 'active' : '' }}">Gallery Manager</a>
         @endrole
 
+        @role('super_admin|memorial_editor|event_manager')
+        <a href="{{ route('admin.stream.edit') }}" class="{{ request()->routeIs('admin.stream.*') ? 'active' : '' }}">Live Stream</a>
+        @endrole
+
         @role('super_admin|moderator')
         <a href="{{ route('admin.tributes.index') }}" class="{{ request()->routeIs('admin.tributes.*') ? 'active' : '' }}">Tribute Moderation</a>
         <a href="{{ route('admin.contact.index') }}" class="{{ request()->routeIs('admin.contact.*') ? 'active' : '' }}">Enquiries</a>
